@@ -47,6 +47,8 @@ TestModel.find(1)
 
 # finde by field 
 TestModel.find_by(name="tets new name").first()
+
+TestModel.query # all query in SQLAlchemy
 ```
 
 ## Custom fetch errors 
