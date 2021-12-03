@@ -10,7 +10,7 @@ def raise_errors(errors, *args, **kw):
 
 class CustomProperty(property):
 
-    def __get__(self, cls):
+    def __get__(self, _, cls):
         return self.fget(cls)
 
 
@@ -20,7 +20,7 @@ class BaseModel:
 
     handler_errors = raise_errors
 
-    id = Column(types.BigInteger, primary_key=True, index=True, autoincrement=True)
+    id = Column(types.Integer, primary_key=True, index=True, autoincrement=True)
     
 
     @declared_attr
@@ -40,8 +40,8 @@ class BaseModel:
         return obj
     
     @classmethod
-    def filter(cls, **kw):
-        return cls.query.filter(**kw)
+    def find_by(cls, **kw):
+        return cls.query.filter_by(**kw)
 
     @classmethod
     def create(cls, **kw):
@@ -49,6 +49,7 @@ class BaseModel:
             obj = cls(**kw)
             cls.session.add(obj)
             cls.session.commit()
+            return obj
         except SQLAlchemyError as err :
             cls.session.rollback()
             cls.handler_errors(err.__dict__.get("orig", "Opps errors"), 'create', **kw)
@@ -65,8 +66,9 @@ class BaseModel:
 
     def update(self, **kw):
         try:
-            obj = self.filter(id=self.id)
-            self.update(kw)
+            obj = self.find_by(id=self.id)
+            obj.update(kw)
+            self.session.commit()
             return obj.first()
         except SQLAlchemyError as err :
             self.session.rollback()
@@ -83,7 +85,7 @@ class BaseModel:
 
 
     def __repr__(self) -> str:
-        return f"<{self.__name__} (id={self.id})>"
+        return f"<{self.__class__.__name__} (id={self.id})>"
 
 
 

@@ -6,12 +6,17 @@ class SQLAlchemy:
 
     def __init__(self, **kw):
 
-        self.init__app(**kw)
+        if kw:
+            self.init__app(**kw)
 
     def init__app(self, **kw):
 
         self.engine = create_engine(**kw)
-        self.session = scoped_session(sessionmaker(bind=self.engine))
+        self.session = scoped_session(sessionmaker(
+            autocommit=False,
+            autoflush=False,
+            bind=self.engine
+        ))
 
         BaseModel.session = self.session()
 
@@ -22,6 +27,13 @@ class SQLAlchemy:
 
         self.__model.metadata.create_all(bind=self.engine)
 
+    def drop_all(self):
+
+        self.__model.metadata.drop_all(bind=self.engine)
+
+    @property
+    def tables(self):
+        return self.engine.table_names()
 
     @property
     def Model(self):
