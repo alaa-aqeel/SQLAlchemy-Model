@@ -22,10 +22,9 @@ class TestModel(db.Model):
 
 
 # db.drop_all()
-db.create_all()
+# db.create_all()
 
 # TestModel.create(name="tet name")
-
 # test.update(name="test new name")
 # print(TestModel.find(1).name) # test new name
 
