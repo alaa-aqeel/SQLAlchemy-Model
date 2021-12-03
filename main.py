@@ -33,5 +33,5 @@ model_valid = Validate(
     TestModel
 )
 
-test = model.create()
+test = model_valid.create()
 print(test)
